@@ -1,0 +1,185 @@
+<template>
+<div class="book">
+  <div
+    class="page-box-public"
+    :class="'page-box-' + (index+1)"
+    v-for="(item,index) in imgList"
+    :key="index"
+    :style="{zIndex: item.zIndex}"
+    ref="zIndex">
+    <div class="page-public"
+      @touchstart="startHandler"
+      @touchmove="moveHandler"
+      @touchend="endHandler">
+      <img :src="item.url" alt="">
+      <p class="page-p" v-if="index > 0">{{item.title}}</p>
+    </div>
+  </div>
+</div>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      imgList: [
+        {
+          url:require('../assets/1.png'),
+          title: '越是熟的朋友对话就越粗鲁，越是熟的朋友行为就越猥琐。'
+        },
+        {
+          url:require('../assets/2.png'),
+          title: '也许，我喜欢你，就是因为你是我认识的人中，唯一不可归类的人。'
+        },
+        {
+          url:require('../assets/3.png'),
+          title: '彼岸花。开一千年，落一千年，花叶永不相见，生生想错。'
+        },
+        {
+          url:require('../assets/4.png'),
+          title: '也许，我喜欢你，就是因为你是我认识的人中，唯一不可归类的人。'
+        },
+        {
+          url:require('../assets/5.png'),
+          title: '彼岸花。开一千年，落一千年，花叶永不相见，生生想错。'
+        },
+        {
+          url:require('../assets/6.png'),
+          title: '也许，我喜欢你，就是因为你是我认识的人中，唯一不可归类的人。'
+        },
+        {
+          url:require('../assets/7.png'),
+          title: '彼岸花。开一千年，落一千年，花叶永不相见，生生想错。'
+        },
+        {
+          url:require('../assets/8.png'),
+          title: '越是熟的朋友对话就越粗鲁，越是熟的朋友行为就越猥琐。'
+        }
+      ],
+      zIndex: 0
+    }
+  },
+  created () {
+    this.imgList.forEach((item,index) => {
+      item.zIndex = (this.imgList.length - index)
+    })
+  },
+  methods: {
+    startHandler (e) {
+      console.log(e,'startHandler')
+      this.startLocation = e.changedTouches[0].clientX
+    },
+    moveHandler (e) {
+      e.stopPropagation()
+      e.preventDefault()
+      this.imgDeg = parseInt((this.startLocation - e.changedTouches[0].clientX) / 2)
+      this._imgDeg = this.imgDeg
+      if (this.imgDeg >= 0) {
+        this.imgDeg = Math.abs(this.imgDeg)
+        if (this.imgDeg >= 0 && this.imgDeg <= 180) {
+          this.publicRotate(e,this.imgDeg)
+        }
+      } else {
+        if (this.imgDeg <= 0 && this.imgDeg >= -180) {
+          this.imgDeg = this.imgDeg + 180
+          this.publicRotate(e,this.imgDeg)
+        }
+      }
+    },
+    endHandler (e) {
+      if (this._imgDeg < 0 && this.imgDeg <= 135) {
+        this.selfSetInterval(1,1,e,this.imgDeg)
+      } else if (this._imgDeg < 0 && this.imgDeg > 135) {
+        this.selfSetInterval(0,0,e,this.imgDeg)
+      } else if (this._imgDeg > 0 && this.imgDeg >= 45) {
+        this.selfSetInterval(0,0,e,this.imgDeg)
+      } else if (this._imgDeg > 0 && this.imgDeg < 45) {
+        this.selfSetInterval(0,1,e,this.imgDeg)
+      }
+    },
+    publicRotate (e,deg,zIndex) {
+      if (e.target.classList.value) {
+        if (e.target.classList.value.length == 11) {
+          e.target.parentNode.style.transform = "rotateY(-" + deg + "deg)"
+          e.target.parentNode.style.zIndex = zIndex
+        } else if (e.target.classList.value == 'book' && e.target.classList.value.length == 4) {
+          e.target.childNodes[0].style.transform = "rotateY(-" + deg + "deg)"
+          e.target.childNodes[0].style.zIndex = zIndex
+        }  else if (e.target.classList.value === 'page-p') {
+          e.target.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
+          e.target.parentNode.parentNode.style.zIndex = zIndex
+        } else {
+          e.target.style.transform = "rotateY(-" + deg + "deg)"
+          e.target.style.zIndex = zIndex
+        }
+      } else {
+        e.target.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
+        e.target.parentNode.parentNode.style.zIndex = zIndex
+      }
+    },
+    selfSetInterval (endFlag,computedType,e,imgDeg) {
+      let timeId = setInterval(() => {
+        if (endFlag) {
+          if (imgDeg <= 0) {
+            this.publicRotate(e,imgDeg,++this.zIndex)
+            clearInterval(timeId)
+            return
+          }
+        } else {
+          if (imgDeg >= 179) {
+            console.log(e)
+            this.publicRotate(e,imgDeg,++this.zIndex)
+            clearInterval(timeId)
+            return
+          }
+        }
+        if (computedType) {
+          --imgDeg
+        } else {
+          ++imgDeg
+        }
+        this.publicRotate(e,imgDeg)
+      },10)
+    }
+  }
+}
+</script>
+
+<style scoped>
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: #212121;
+  perspective: 1000px;
+}
+.book {
+  width: 800px;
+  margin: 0 auto;
+  position: relative;
+  transform: rotateX(30deg);
+  transform-style: preserve-3d;
+}
+.page-box-public {
+  width: 600px;
+  height: 400px;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.page-public {
+  width: 300px;
+  height: 400px;
+  position: absolute;
+  left: 50%;
+  background: #fff;
+  border: 1px solid #96a36e;
+}
+.page-p {
+  font-size: 18px;
+  margin-top: 20px;
+  padding: 30px;
+  text-align: left;
+}
+</style>
