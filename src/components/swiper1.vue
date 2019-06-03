@@ -111,7 +111,7 @@ export default {
         this.selfSetInterval(0,1,e,this.imgDeg)
       }
     },
-    publicRotate (e,deg,zIndex) {
+    publicRotate (e,deg,computedType,zIndex) {
       /**
        * 通过不同的点击获取到具体的标签，开始找子元素或者父元素，最终都是让
        * page-box-public
@@ -144,30 +144,50 @@ export default {
         // 控制img标签
         e.target.parentNode.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
         e.target.parentNode.parentNode.parentNode.style.zIndex = zIndex
+        if (computedType) {
+          if (e.target.classList.value == 'page-ahead') {
+            e.target.parentNode.style.zIndex = zIndex
+          }
+        } else {
+          if (e.target.classList.value == 'page-ahead') {
+            e.target.parentNode.style.zIndex = zIndex
+          }
+        }
       }
     },
     selfSetInterval (endFlag,computedType,e,imgDeg) {
       let timeId = setInterval(() => {
         if (endFlag) {
           if (imgDeg <= 0) {
-            this.publicRotate(e,imgDeg,++this.zIndex)
+            this.publicRotate(e,imgDeg,computedType,++this.zIndex)
             clearInterval(timeId)
             return
           }
         } else {
           if (imgDeg >= 179) {
             console.log(e)
-            this.publicRotate(e,imgDeg,++this.zIndex)
+            this.publicRotate(e,imgDeg,computedType,++this.zIndex)
             clearInterval(timeId)
             return
           }
         }
+        /**
+         * computedType 0打开 1合上
+         * 区分每页是打开还是合上。
+         * 小于45度：1合上
+         * 大于45度：0打开
+         * 小于135度：1打开（准确的说是，翻开了一页，但是合上的角度小，就又平躺下来了）
+         * 大于135：0合上
+         */
         if (computedType) {
+          // 合上
           --imgDeg
         } else {
+          // 打开
           ++imgDeg
         }
-        this.publicRotate(e,imgDeg)
+        // computedType传过去这个值，可以知道，用户是左翻还是右翻
+        this.publicRotate(e,imgDeg,computedType)
       },10)
     }
   }
