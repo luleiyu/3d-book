@@ -11,8 +11,14 @@
       @touchstart="startHandler"
       @touchmove="moveHandler"
       @touchend="endHandler">
-      <img :src="item.url" alt="">
-      <p class="page-p" v-if="index > 0">{{item.title}}</p>
+      <div class="page-ahead">
+        <img :src="item.url" alt="">
+        <p class="page-p" v-if="index > 0">{{item.title}}</p>
+      </div>
+      <div class="page-after">
+        <img :src="item.url1" alt="">
+        <p class="page-p" v-if="index > 0">{{item.title}}</p>
+      </div>
     </div>
   </div>
 </div>
@@ -25,34 +31,42 @@ export default {
       imgList: [
         {
           url:require('../assets/1.png'),
+          url1:require('../assets/7.png'),
           title: '越是熟的朋友对话就越粗鲁，越是熟的朋友行为就越猥琐。'
         },
         {
-          url:require('../assets/2.png'),
+          url:require('../assets/4.png'),
+          url1:require('../assets/2.png'),
           title: '也许，我喜欢你，就是因为你是我认识的人中，唯一不可归类的人。'
         },
         {
           url:require('../assets/3.png'),
+          url1:require('../assets/2.png'),
           title: '彼岸花。开一千年，落一千年，花叶永不相见，生生想错。'
         },
         {
-          url:require('../assets/4.png'),
+          url:require('../assets/2.png'),
+          url1:require('../assets/4.png'),
           title: '也许，我喜欢你，就是因为你是我认识的人中，唯一不可归类的人。'
         },
         {
           url:require('../assets/5.png'),
+          url1:require('../assets/2.png'),
           title: '彼岸花。开一千年，落一千年，花叶永不相见，生生想错。'
         },
         {
-          url:require('../assets/6.png'),
+          url:require('../assets/2.png'),
+          url1:require('../assets/6.png'),
           title: '也许，我喜欢你，就是因为你是我认识的人中，唯一不可归类的人。'
         },
         {
           url:require('../assets/7.png'),
+          url1:require('../assets/2.png'),
           title: '彼岸花。开一千年，落一千年，花叶永不相见，生生想错。'
         },
         {
-          url:require('../assets/8.png'),
+          url:require('../assets/2.png'),
+          url1:require('../assets/8.png'),
           title: '越是熟的朋友对话就越粗鲁，越是熟的朋友行为就越猥琐。'
         }
       ],
@@ -98,23 +112,38 @@ export default {
       }
     },
     publicRotate (e,deg,zIndex) {
+      /**
+       * 通过不同的点击获取到具体的标签，开始找子元素或者父元素，最终都是让
+       * page-box-public
+       * 进行翻转
+       */
+      // 判断 e.target.classList.value 是否有值 有值说明含有类名（class），没值就是标签
       if (e.target.classList.value) {
         if (e.target.classList.value.length == 11) {
+          // 控制 page-public
           e.target.parentNode.style.transform = "rotateY(-" + deg + "deg)"
           e.target.parentNode.style.zIndex = zIndex
         } else if (e.target.classList.value == 'book' && e.target.classList.value.length == 4) {
+          // 控制 book
           e.target.childNodes[0].style.transform = "rotateY(-" + deg + "deg)"
           e.target.childNodes[0].style.zIndex = zIndex
-        }  else if (e.target.classList.value === 'page-p') {
+        } else if (e.target.classList.value === 'page-p') {
+          // 控制 page-p
+          e.target.parentNode.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
+          e.target.parentNode.parentNode.parentNode.style.zIndex = zIndex
+        } else if (e.target.classList.value.length == 10) {
+          // 控制 page-ahead 和 page-after
           e.target.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
           e.target.parentNode.parentNode.style.zIndex = zIndex
         } else {
+          // 控制 page-box-public
           e.target.style.transform = "rotateY(-" + deg + "deg)"
           e.target.style.zIndex = zIndex
         }
       } else {
-        e.target.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
-        e.target.parentNode.parentNode.style.zIndex = zIndex
+        // 控制img标签
+        e.target.parentNode.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
+        e.target.parentNode.parentNode.parentNode.style.zIndex = zIndex
       }
     },
     selfSetInterval (endFlag,computedType,e,imgDeg) {
@@ -181,5 +210,18 @@ body {
   margin-top: 20px;
   padding: 30px;
   text-align: left;
+}
+.page-ahead {
+  position:absolute;
+  top:0px;
+  left:50px;
+  z-index:1;
+}
+.page-after {
+  position:absolute;
+  top:0px;
+  left:50px;
+  z-index:1;
+  transform: scale(-1, 1);
 }
 </style>
