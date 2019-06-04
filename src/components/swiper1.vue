@@ -70,7 +70,7 @@ export default {
           title: '越是熟的朋友对话就越粗鲁，越是熟的朋友行为就越猥琐。'
         }
       ],
-      zIndex: 0
+      zIndex: 8
     }
   },
   created () {
@@ -144,32 +144,35 @@ export default {
         // 控制img标签
         e.target.parentNode.parentNode.parentNode.style.transform = "rotateY(-" + deg + "deg)"
         e.target.parentNode.parentNode.parentNode.style.zIndex = zIndex
+        console.log(zIndex)
         if (computedType) {
-          if (e.target.classList.value == 'page-ahead') {
-            e.target.parentNode.style.zIndex = zIndex
+          if (deg < 90) {
+            console.log(e)
+            if (e.target.parentNode.classList.value == 'page-after') {
+              e.target.parentNode.style.zIndex = 1
+              e.target.parentNode.previousSibling.style.zIndex = 2
+            }
           }
         } else {
-          if (e.target.classList.value == 'page-ahead') {
-            e.target.parentNode.style.zIndex = zIndex
+          if (deg > 90) {
+            if (e.target.parentNode.classList.value == 'page-ahead') {
+              e.target.parentNode.style.zIndex = 1
+              e.target.parentNode.nextSibling.style.zIndex = 2
+            }
           }
         }
       }
     },
     selfSetInterval (endFlag,computedType,e,imgDeg) {
       let timeId = setInterval(() => {
-        if (endFlag) {
-          if (imgDeg <= 0) {
-            this.publicRotate(e,imgDeg,computedType,++this.zIndex)
-            clearInterval(timeId)
-            return
-          }
-        } else {
-          if (imgDeg >= 179) {
-            console.log(e)
-            this.publicRotate(e,imgDeg,computedType,++this.zIndex)
-            clearInterval(timeId)
-            return
-          }
+        if (imgDeg <= 0) {
+          this.zIndexMethod(endFlag,imgDeg,e,computedType)
+          clearInterval(timeId)
+          return
+        } else if (imgDeg >= 179) {
+          this.zIndexMethod(endFlag,imgDeg,e,computedType)
+          clearInterval(timeId)
+          return
         }
         /**
          * computedType 0打开 1合上
@@ -189,6 +192,18 @@ export default {
         // computedType传过去这个值，可以知道，用户是左翻还是右翻
         this.publicRotate(e,imgDeg,computedType)
       },10)
+    },
+    zIndexMethod (endFlag,imgDeg,e,computedType) {
+      if (endFlag) {
+        if (imgDeg <= 0) {
+          this.publicRotate(e,imgDeg,computedType,++this.zIndex)
+        }
+      } else {
+        if (imgDeg >= 179) {
+          console.log(e)
+          this.publicRotate(e,imgDeg,computedType,++this.zIndex)
+        }
+      }
     }
   }
 }
@@ -228,14 +243,15 @@ body {
 .page-p {
   font-size: 18px;
   margin-top: 20px;
-  padding: 30px;
+  padding: 25px;
   text-align: left;
 }
 .page-ahead {
   position:absolute;
   top:0px;
   left:50px;
-  z-index:1;
+  z-index:2;
+  background: red;
 }
 .page-after {
   position:absolute;
@@ -243,5 +259,6 @@ body {
   left:50px;
   z-index:1;
   transform: scale(-1, 1);
+  background: pink;
 }
 </style>
