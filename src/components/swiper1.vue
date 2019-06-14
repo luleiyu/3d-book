@@ -7,7 +7,7 @@
     :key="index"
     :style="{zIndex: item.zIndex}"
     ref="zIndex">
-    <div class="page-public"
+    <div :class="index === 0 ? 'page-public' : 'page-pubbgc'"
       @touchstart="startHandler"
       @touchmove="moveHandler"
       @touchend="endHandler">
@@ -238,6 +238,13 @@ body {
   position: absolute;
   left: 50%;
   background: #fff;
+  border: 1px solid #96a36e;
+}
+.page-pubbgc {
+  width: 300px;
+  height: 400px;
+  position: absolute;
+  left: 50%;
   border: 1px solid #96a36e;
 }
 .page-p {
